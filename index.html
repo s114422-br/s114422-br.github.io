@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>不要嚇跑地瓜鳥！學測保衛戰 V4</title>
+    <title>不要嚇跑地瓜鳥！學測保衛戰 V6</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -22,10 +22,11 @@
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            box-sizing: border-box;
         }
         #bird-container {
             width: 100%;
-            height: 350px; 
+            height: 300px; 
             display: flex;
             justify-content: center;
             align-items: center;
@@ -56,30 +57,42 @@
             border-radius: 10px;
             line-height: 1.5;
         }
+        
+        /* 驚嚇度計量條 - 這次直接顯示，方便檢查有沒有動！ */
+        #alert-container {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            height: 20px;
+            border: 1px solid #ccc;
+        }
+        #alert-bar {
+            width: 0%;
+            height: 100%;
+            background-color: #2e7d32;
+            transition: width 0.05s linear;
+        }
+
         #btn-approach {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: bold;
-            padding: 18px 50px;
+            padding: 20px 60px;
             background-color: #7a5c42; 
             color: white;
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            /* 防止手機長按彈出選單 */
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            
+            /* 關閉所有可能干擾的預設點擊行為 */
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
-            touch-action: none; 
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-            transition: background-color 0.1s;
         }
         #btn-approach:active {
             background-color: #5d4632;
-        }
-        #btn-approach:disabled {
-            background-color: #aaa;
-            cursor: not-allowed;
-            box-shadow: none;
         }
         #disclaimer {
             font-size: 14px;
@@ -87,35 +100,26 @@
             margin-top: 20px;
         }
         .safe-text { color: #2e7d32; }
-        .warning-text { color: #f57c00; font-weight: 900; animation: shake-text 0.1s infinite; }
+        .warning-text { color: #f57c00; font-weight: 900; }
         .danger-text { color: #d32f2f; font-weight: 900; }
         .win-text { color: #1565c0; font-weight: 900; }
-        
-        @keyframes shake-text {
-            0% { transform: translate(1px, 1px); }
-            50% { transform: translate(-1px, -1px); }
-            100% { transform: translate(1px, -1px); }
-        }
-
-        .warning-bird { animation: shake-bird 0.15s infinite; }
-        @keyframes shake-bird {
-            0% { transform: rotate(0deg); }
-            25% { transform: rotate(0.8deg); }
-            75% { transform: rotate(-0.8deg); }
-            100% { transform: rotate(0deg); }
-        }
     </style>
 </head>
 <body>
 
 <div id="game-container">
     <h2>🐦 地瓜鳥學測保衛戰 🍠</h2>
-    <p style="color: #666; font-size: 15px;">遊戲規則：趁地瓜鳥發呆時按住按鈕「悄悄靠近」！牠如果扭脖子警告或轉頭狠瞪，請立刻放開按鈕，否則牠飛走，你的學測就GG了！</p>
+    <p style="color: #666; font-size: 15px;">核心規則：按住按鈕前進，驚嚇條會爆升！放開按鈕會冷靜。注意地瓜鳥的狀態！</p>
     
     <div id="bird-container">
         <img id="bird-image" src="https://upload.wikimedia.org/wikipedia/commons/d/df/Malayan_Night-Heron_-_Taiwan_S4E8695_%2817320173361%29.jpg" alt="地瓜鳥發呆">
     </div>
     
+    <div style="font-size: 14px; text-align: left; margin-bottom: 5px; color: #666;">地瓜鳥警覺心：</div>
+    <div id="alert-container">
+        <div id="alert-bar"></div>
+    </div>
+
     <div id="status-text" class="safe-text">地瓜鳥正在裝成一顆地瓜...</div>
     
     <div id="score-board">
@@ -123,7 +127,14 @@
         預估學測分數：<span id="score">0</span> 級分
     </div>
     
-    <button id="btn-approach">按住悄悄靠近</button>
+    <button id="btn-approach" 
+            onmousedown="startApproach()" 
+            onmouseup="stopApproach()" 
+            onmouseleave="stopApproach()"
+            ontouchstart="startApproach()" 
+            ontouchend="stopApproach()">
+        按住悄悄靠近
+    </button>
 </div>
 
 <div id="disclaimer">⚠️ 本遊戲僅供娛樂，祝福各位學測順利。</div>
@@ -134,6 +145,7 @@
     const distanceEl = document.getElementById('distance');
     const scoreEl = document.getElementById('score');
     const btnApproach = document.getElementById('btn-approach');
+    const alertBar = document.getElementById('alert-bar');
 
     const imgUrls = {
         safe: 'https://upload.wikimedia.org/wikipedia/commons/d/df/Malayan_Night-Heron_-_Taiwan_S4E8695_%2817320173361%29.jpg', 
@@ -148,118 +160,92 @@
     let score = 0;
     let gameState = 'SAFE'; 
     let isPressing = false;
-    let gameLoop;
-    let stateTimeout;
+    let alertLevel = 0; 
 
-    function changeBirdState() {
+    // 使用最穩定的單一主循環，每 40 毫秒執行一次
+    setInterval(function() {
         if (gameState === 'GAME_OVER' || gameState === 'WIN') return;
 
-        clearTimeout(stateTimeout);
-        const rand = Math.random();
-        
-        if (gameState === 'SAFE') {
-            if (rand > 0.45) {
-                gameState = 'WARNING';
-                birdImageEl.src = imgUrls.warning; 
-                birdImageEl.className = 'warning-bird'; 
-                statusTextEl.innerText = '（牠開始瘋狂抖動脖子了！！）';
-                statusTextEl.className = 'warning-text';
-                stateTimeout = setTimeout(changeBirdState, Math.random() * 800 + 500); 
-            } else {
-                stateTimeout = setTimeout(changeBirdState, Math.random() * 1500 + 1000);
-            }
-        } else if (gameState === 'WARNING') {
+        // 1. 計算驚嚇值
+        if (isPressing) {
+            alertLevel += 2.5; // 按住時驚嚇值爬升
+        } else {
+            alertLevel -= 1.5; // 放開時驚嚇值冷卻
+        }
+
+        // 邊界限制
+        if (alertLevel < 0) alertLevel = 0;
+        if (alertLevel > 100) alertLevel = 100;
+
+        // 更新驚嚇條視覺
+        alertBar.style.width = alertLevel + '%';
+
+        // 2. 判斷地瓜鳥狀態與換圖
+        if (alertLevel <= 40) {
+            gameState = 'SAFE';
+            statusTextEl.innerText = '地瓜鳥正在裝成一顆地瓜...';
+            statusTextEl.className = 'safe-text';
+            birdImageEl.src = isPressing ? imgUrls.approaching : imgUrls.safe;
+            alertBar.style.backgroundColor = '#2e7d32';
+        } 
+        else if (alertLevel > 40 && alertLevel <= 85) {
+            gameState = 'WARNING';
+            statusTextEl.innerText = '（警告：牠開始瘋狂扭脖子了！！）';
+            statusTextEl.className = 'warning-text';
+            birdImageEl.src = imgUrls.warning;
+            alertBar.style.backgroundColor = '#f57c00';
+        } 
+        else if (alertLevel > 85) {
             gameState = 'DANGER';
-            birdImageEl.src = imgUrls.danger; 
-            birdImageEl.className = ''; 
             statusTextEl.innerText = '！！！牠轉過來狠瞪你了！！！';
             statusTextEl.className = 'danger-text';
-            stateTimeout = setTimeout(changeBirdState, Math.random() * 1000 + 600); 
-        } else if (gameState === 'DANGER') {
-            gameState = 'SAFE';
-            birdImageEl.src = isPressing ? imgUrls.approaching : imgUrls.safe;
-            birdImageEl.className = '';
-            statusTextEl.innerText = '呼... 牠又開始發呆了。';
-            statusTextEl.className = 'safe-text';
-            stateTimeout = setTimeout(changeBirdState, Math.random() * 2000 + 1000);
-        }
-    }
+            birdImageEl.src = imgUrls.danger;
+            alertBar.style.backgroundColor = '#d32f2f';
 
-    // 啟動地瓜鳥狀態變換
-    stateTimeout = setTimeout(changeBirdState, 2000);
-
-    // 靠近的核心邏輯
-    function tick() {
-        if (!isPressing || gameState === 'GAME_OVER' || gameState === 'WIN') return;
-
-        if (gameState === 'DANGER') {
-            gameState = 'GAME_OVER';
-            clearTimeout(stateTimeout);
-            birdImageEl.src = imgUrls.flyaway; 
-            statusTextEl.innerText = '地瓜鳥飛走了！學測扣 60 級分，重考班在等你了...😭';
-            statusTextEl.className = 'danger-text';
-            btnApproach.disabled = true;
-            btnApproach.innerText = '學測已考爆';
-            clearInterval(gameLoop);
-            return;
+            // 危險期只要玩家還在按，直接爆開
+            if (isPressing) {
+                gameState = 'GAME_OVER';
+                birdImageEl.src = imgUrls.flyaway;
+                statusTextEl.innerText = '地瓜鳥飛走了！學測扣 60 級分，重考班在等你了...😭';
+                btnApproach.style.display = 'none'; // 直接隱藏按鈕防止再點
+                return;
+            }
         }
 
-        if (distance > 0.05) {
-            distance -= 0.05; 
-            score = Math.floor((5 - distance) * 12.5); 
-            if (score > 60) score = 60;
-            
-            distanceEl.innerText = distance.toFixed(2);
-            scoreEl.innerText = score;
-        } else {
-            gameState = 'WIN';
-            clearTimeout(stateTimeout);
-            birdImageEl.src = imgUrls.win; 
-            statusTextEl.innerText = '✨ 你成功摸到了地瓜鳥！滿級分神話降臨！💯 ✨';
-            statusTextEl.className = 'win-text';
-            btnApproach.disabled = true;
-            btnApproach.innerText = '台大我來了！';
-            clearInterval(gameLoop);
-        }
-    }
+        // 3. 玩家前進扣距離
+        if (isPressing && gameState !== 'DANGER') {
+            if (distance > 0.05) {
+                distance -= 0.05;
+                score = Math.floor((5 - distance) * 12.5);
+                if (score > 60) score = 60;
 
-    // 開始靠近
+                distanceEl.innerText = distance.toFixed(2);
+                scoreEl.innerText = score;
+            } else {
+                gameState = 'WIN';
+                birdImageEl.src = imgUrls.win;
+                statusTextEl.innerText = '✨ 你成功摸到了地瓜鳥！滿級分神話降臨！💯 ✨';
+                statusTextEl.className = 'win-text';
+                btnApproach.style.display = 'none';
+            }
+        }
+    }, 40);
+
+    // 觸發前進
     function startApproach() {
-        if (gameState === 'GAME_OVER' || gameState === 'WIN' || isPressing) return;
-        
-        isPressing = true;
-        btnApproach.innerText = '正在悄悄靠近...';
-        
-        if (gameState === 'SAFE') {
-            birdImageEl.src = imgUrls.approaching;
+        if (gameState !== 'GAME_OVER' && gameState !== 'WIN') {
+            isPressing = true;
+            btnApproach.innerText = '正在悄悄靠近...';
         }
-        
-        clearInterval(gameLoop);
-        gameLoop = setInterval(tick, 50); 
     }
 
-    // 停止靠近
+    // 停止前進
     function stopApproach() {
-        if (gameState === 'GAME_OVER' || gameState === 'WIN' || !isPressing) return;
-        
         isPressing = false;
-        btnApproach.innerText = '按住悄悄靠近';
-        
-        if (gameState === 'SAFE') {
-            birdImageEl.src = imgUrls.safe;
+        if (gameState !== 'GAME_OVER' && gameState !== 'WIN') {
+            btnApproach.innerText = '按住悄悄靠近';
         }
-        
-        clearInterval(gameLoop);
     }
-
-    // 用最乾淨、最不會被瀏覽器阻擋的方式監聽事件（電腦滑鼠 + 手機觸控通用）
-    btnApproach.addEventListener('mousedown', startApproach);
-    btnApproach.addEventListener('mouseup', stopApproach);
-    btnApproach.addEventListener('mouseleave', stopApproach); 
-    
-    btnApproach.addEventListener('touchstart', (e) => { startApproach(); });
-    btnApproach.addEventListener('touchend', (e) => { stopApproach(); });
-    btnApproach.addEventListener('touchcancel', (e) => { stopApproach(); });
 </script>
 
 </body>
