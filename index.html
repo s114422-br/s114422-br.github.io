@@ -3,241 +3,320 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>音樂心理測驗：深夜的寂寞唱片行</title>
+    <title>🐾 雲端天竺鼠養成日記 🐾</title>
     <style>
         body {
-            background-color: #121212;
-            color: #e0e0e0;
-            font-family: 'Helvetica Neue', Helvetica, Arial, "Microsoft JhengHei", sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fdfbf7, #eef5f3);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
+            color: #4a4a4a;
         }
-        .container {
-            background-color: #1e1e1e;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            max-width: 600px;
-            width: 100%;
+
+        .game-container {
+            background-color: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+            width: 400px;
             text-align: center;
-            border: 1px solid #333;
+            border: 4px solid #e2d4c9;
         }
+
         h1 {
-            color: #ff4081;
             font-size: 24px;
+            color: #8d6e63;
+            margin-top: 0;
+        }
+
+        /* 顏色選擇器 */
+        .color-picker {
             margin-bottom: 20px;
-            letter-spacing: 2px;
         }
-        p.intro {
-            line-height: 1.8;
-            color: #aaa;
-            margin-bottom: 30px;
-            font-size: 16px;
-        }
-        .question-text {
-            font-size: 20px;
-            margin-bottom: 25px;
-            color: #fff;
-            font-weight: 500;
-        }
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 15px 20px;
-            margin: 12px 0;
-            background-color: #2a2a2a;
-            color: #e0e0e0;
-            border: 1px solid #444;
-            border-radius: 8px;
+        .color-btn {
+            border: none;
+            padding: 8px 16px;
+            margin: 0 5px;
+            border-radius: 20px;
             cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s ease;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .color-btn:hover { transform: scale(1.05); }
+        #btn-tricolor { background-color: #d7ccc8; color: #5d4037; }
+        #btn-cream { background-color: #fff9c4; color: #fbc02d; }
+        #btn-agouti { background-color: #cfd8dc; color: #455a64; }
+
+        /* 天竺鼠舞台 */
+        .stage {
+            height: 200px;
+            position: relative;
+            background-color: #f5f5f5;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 天竺鼠本體 (純CSS繪製) */
+        .guinea-pig {
+            width: 150px;
+            height: 100px;
+            border-radius: 70px 90px 60px 60px;
+            position: relative;
+            transition: all 0.5s ease, transform 0.1s;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* 毛色樣式 */
+        .tricolor { background: linear-gradient(90deg, #5d4037 30%, #ffffff 30%, #ffffff 70%, #ffa726 70%); }
+        .cream { background: linear-gradient(90deg, #fff59d 40%, #fff9c4 40%); }
+        .agouti { background: linear-gradient(90deg, #8d6e63 50%, #b0bec5 50%); }
+
+        /* 五官與裝飾 */
+        .ear {
+            position: absolute;
+            top: -10px;
+            left: 30px;
+            width: 25px;
+            height: 25px;
+            background-color: #ff8a80;
+            border-radius: 50%;
+            z-index: -1;
+        }
+        .eye {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            width: 12px;
+            height: 12px;
+            background-color: #212121;
+            border-radius: 50%;
+        }
+        .eye::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 4px;
+            height: 4px;
+            background-color: white;
+            border-radius: 50%;
+        }
+        .nose {
+            position: absolute;
+            top: 40px;
+            left: -2px;
+            width: 10px;
+            height: 8px;
+            background-color: #ff8a80;
+            border-radius: 50%;
+        }
+
+        /* 動畫特效 */
+        @keyframes eating {
+            0% { transform: scale(1) translateX(0); }
+            50% { transform: scale(1.05) translateX(-5px); }
+            100% { transform: scale(1) translateX(0); }
+        }
+        @keyframes petting {
+            0% { transform: scale(1) translateY(0); }
+            50% { transform: scale(0.95) translateY(5px); }
+            100% { transform: scale(1) translateY(0); }
+        }
+        .is-eating { animation: eating 0.3s cubic-bezier(.36,.07,.19,.97) double; }
+        .is-petting { animation: petting 0.2s ease-in-out; }
+
+        /* 漂浮文字 (515151、PuiPui) */
+        .floating-text {
+            position: absolute;
+            color: #ff7043;
+            font-weight: bold;
+            font-size: 18px;
+            animation: floatUp 0.8s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-40px); }
+        }
+
+        /* 狀態條 */
+        .status-container {
+            margin-bottom: 20px;
             text-align: left;
         }
-        .btn:hover {
-            background-color: #ff4081;
-            color: #fff;
-            border-color: #ff4081;
-            transform: translateY(-2px);
+        .status-bar {
+            background-color: #e0e0e0;
+            height: 15px;
+            border-radius: 10px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            overflow: hidden;
         }
-        .result-title {
-            color: #00e5ff;
-            font-size: 22px;
-            margin-top: 10px;
+        .progress {
+            height: 100%;
+            width: 100%;
+            background-color: #81c784;
+            transition: width 0.3s ease;
         }
-        .song-title {
-            font-size: 26px;
-            color: #fff;
-            margin: 20px 0;
-            font-weight: bold;
-            text-shadow: 0 0 10px rgba(0,229,255,0.3);
+        #happiness-bar { background-color: #ffb74d; }
+
+        /* 按鈕區 */
+        .action-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
         }
-        .yt-link {
-            display: inline-block;
-            margin-top: 25px;
-            padding: 12px 30px;
-            background-color: #ff0000;
+        .action-btn {
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            background-color: #8d6e63;
             color: white;
-            text-decoration: none;
-            border-radius: 25px;
+            font-size: 14px;
+            cursor: pointer;
             font-weight: bold;
-            transition: background 0.3s;
+            box-shadow: 0 4px 0 #5d4037;
+            transition: all 0.1s;
         }
-        .yt-link:hover {
-            background-color: #cc0000;
-            box-shadow: 0 0 15px rgba(255,0,0,0.5);
+        .action-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
         }
-        .restart-btn {
-            margin-top: 15px;
-            background-color: transparent;
-            color: #aaa;
-            border: 1px dashed #555;
-            text-align: center;
-        }
-        .restart-btn:hover {
-            background-color: #333;
-            color: #fff;
-        }
+        .action-btn:hover { background-color: #795548; }
     </style>
 </head>
 <body>
 
-<div class="container" id="quiz-box">
-    <!-- 內容會透過 JavaScript 動態切換 -->
+<div class="game-container">
+    <h1>🐹 雲端天竺鼠模擬器 🐹</h1>
+
+    <!-- 選擇毛色 -->
+    <div class="color-picker">
+        <button class="color-btn" id="btn-tricolor" onclick="changeColor('tricolor')">經典三色</button>
+        <button class="color-btn" id="btn-cream" onclick="changeColor('cream')">奶油禮服</button>
+        <button class="color-btn" id="btn-agouti" onclick="changeColor('agouti')">野生水豚色</button>
+    </div>
+
+    <!-- 天竺鼠互動舞台 -->
+    <div class="stage" id="stage">
+        <div class="guinea-pig tricolor" id="pig" onclick="petPig()">
+            <div class="ear"></div>
+            <div class="eye"></div>
+            <div class="nose"></div>
+        </div>
+    </div>
+
+    <!-- 狀態數值 -->
+    <div class="status-container">
+        <div>🌾 飽食度: <span id="hunger-text">100</span>%</div>
+        <div class="status-bar"><div id="hunger-bar" class="progress"></div></div>
+        
+        <div>❤️ 幸福感: <span id="happiness-text">100</span>%</div>
+        <div class="status-bar"><div id="happiness-bar" class="progress"></div></div>
+    </div>
+
+    <!-- 行動指令 -->
+    <div class="action-container">
+        <button class="action-btn" onclick="feedPig('grass')">🌾 餵提摩西草</button>
+        <button class="action-btn" onclick="feedPig('food')">🥕 餵美味飼料</button>
+        <button class="action-btn" onclick="petPig()">🫳 嚕天竺鼠</button>
+    </div>
 </div>
 
 <script>
-    let userAnswers = { q1: '', q2: '', q3: '' };
+    // 遊戲狀態數據
+    let hunger = 100;
+    let happiness = 100;
+    const pig = document.getElementById('pig');
+    const stage = document.getElementById('stage');
 
-    // 擴充後的 11 首歌曲資料庫
-    const songDatabase = {
-        '黑色台北': { status: '都市社畜的集體焦慮/厭世', desc: '被生活壓得喘不過氣，對這個城市有點失望，只想大聲宣洩。', url: 'https://www.youtube.com/results?search_query=荷爾蒙少年+黑色台北' },
-        '天堂與泥土': { status: '徹底擺爛、沉澱的靈魂出竅', desc: '世界太吵了，現在只想躺平，讓意識像水一樣流動，什麼都不想管。', url: 'https://www.youtube.com/results?search_query=deca+joins+天堂與泥土' },
-        'BREATHE': { status: '需要大哭、被溫柔擁抱的極度悲傷', desc: '你真的辛苦了。沒關係，想哭就哭吧，這首歌會陪著你慢慢呼吸。', url: 'https://www.youtube.com/results?search_query=Leehi+BREATHE' },
-        'TATTOO': { status: '帶有高級感的孤獨', desc: '走在深夜的都市，雖然一個人有點寂寞，但我寂寞得很漂亮。', url: 'https://www.youtube.com/results?search_query=Mandark+TATTOO' },
-        'ITEM': { status: '火冒三丈、全火力輸出的宣洩', desc: '少來煩我！現在滿腦子油門踩到底，用最強烈的重低音把不爽全部炸掉。', url: 'https://www.youtube.com/results?search_query=Stray+kids+ITEM' },
-        'Morse Code': { status: '迷惘中帶點熱血的奔跑', desc: '雖然對未來有點不知所措，但血液裡的熱情還沒熄滅，衝就對了！', url: 'https://www.youtube.com/results?search_query=Dragon+Pony+Morse+Code' },
-        'X Song': { status: '酸酸甜甜的戀愛腦/小傲嬌', desc: '心裡有個人讓你想東想西，有點煩躁，但又忍不住一直想他。', url: 'https://www.youtube.com/results?search_query=BOL4+X+Song' },
-        'Just Like This': { status: '微醺微甜的微放空', desc: '今天不想動腦，只想吹著微風，享受一下 Me Time。', url: 'https://www.youtube.com/results?search_query=loco+just+like+this' },
-        'Lisianthus': { status: '充滿希望的充能時刻', desc: '雖然有點累，但音符落下的瞬間，感覺明天又可以繼續加油了！', url: 'https://www.youtube.com/results?search_query=LUCY+Lisianthus' },
-        'I No': { status: '看透生活後的自嘲與釋懷', desc: '「好啦，我知道了。」面對無奈，你選擇用溫柔的嘆息和幽默感放過自己。', url: 'https://www.youtube.com/results?search_query=盧廣仲+I+No' },
-        '言不由衷': { status: '口是心非的遺憾與倔強', desc: '心裡明明很在意，表面上卻還要裝作若無其事。有些遺憾，只能唱進歌裡。', url: 'https://www.youtube.com/results?search_query=甜約翰+言不由衷' }
-    };
-
-    const quizBox = document.getElementById('quiz-box');
-
-    function showStartPage() {
-        quizBox.innerHTML = `
-            <h1>🎵 深夜的寂寞唱片行</h1>
-            <p class="intro">凌晨兩點，你走在一條空無一人的街上，發現一家散發著微光的舊唱片行。<br>門口掛著一塊牌子：「進來吧，這裡有懂你的歌。」<br>你推開門走了進去……</p>
-            <button class="btn" style="text-align:center;" onclick="showQ1()">開啟音樂處方箋</button>
-        `;
+    // 變更天竺鼠毛色
+    function changeColor(colorClass) {
+        pig.className = 'guinea-pig ' + colorClass;
+        createFloatingText('變身！✨');
     }
 
-    function showQ1() {
-        quizBox.innerHTML = `
-            <div class="question-text">Q1. 店裡放著好幾張黑膠唱片，第一張吸引你目光的封面是？</div>
-            <button class="btn" onclick="selectQ1('A')">A. 朦朧的霓虹燈街景，帶著一絲落寞與疲憊。</button>
-            <button class="btn" onclick="selectQ1('B')">B. 燃燒的火焰與極簡的幾何圖形，很有衝突感。</button>
-            <button class="btn" onclick="selectQ1('C')">C. 溫暖的日落海灘，或是兩個人並肩的背影。</button>
-        `;
-    }
-
-    function selectQ1(ans) {
-        userAnswers.q1 = ans;
-        showQ2();
-    }
-
-    function showQ2() {
-        if (userAnswers.q1 === 'A') {
-            quizBox.innerHTML = `
-                <div class="question-text">Q2. 店長遞給你一杯飲料，這時候你最想喝什麼？</div>
-                <button class="btn" onclick="selectQ2('A-1')">A-1. 冰美式，苦澀但能讓我保持清醒。</button>
-                <button class="btn" onclick="selectQ2('A-2')">A-2. 烈酒，今晚只想把自己灌醉麻痺。</button>
-                <button class="btn" onclick="selectQ2('A-3')">A-3. 溫熱的熱可可，我現在需要被溫暖。</button>
-                <button class="btn" onclick="selectQ2('A-4')">A-4. 白開水，淡淡的沒味道，就像我現在的心情。</button>
-            `;
-        } else if (userAnswers.q1 === 'B') {
-            quizBox.innerHTML = `
-                <div class="question-text">Q2. 唱片行後方突然傳來一陣撞擊聲，你的第一反應是？</div>
-                <button class="btn" onclick="selectQ2('B-1')">B-1. 握緊拳頭，心裡莫名燃起一把火，想去一探究竟。</button>
-                <button class="btn" onclick="selectQ2('B-2')">B-2. 隨著聲音的節奏心跳加快，感到一種莫名的熱血。</button>
-            `;
-        } else if (userAnswers.q1 === 'C') {
-            quizBox.innerHTML = `
-                <div class="question-text">Q2. 這時候，店裡的角落有一隻貓咪悄悄走過來蹭你的腳，你覺得牠在想什麼？</div>
-                <button class="btn" onclick="selectQ2('C-1')">C-1. 牠只是肚子餓了，跟我一樣想找個依靠。</button>
-                <button class="btn" onclick="selectQ2('C-2')">C-2. 牠純粹想陪著我，享受這個安靜的片刻。</button>
-                <button class="btn" onclick="selectQ2('C-3')">C-3. 牠在幫我加油打氣，告訴我明天會更好。</button>
-                <button class="btn" onclick="selectQ2('C-4')">C-4. 牠看穿了我的心事，卻假裝不知道。</button>
-            `;
-        }
-    }
-
-    function selectQ2(ans) {
-        userAnswers.q2 = ans;
-        showQ3();
-    }
-
-    function showQ3() {
-        quizBox.innerHTML = `
-            <div class="question-text">Q3. 當你準備戴上耳機試聽，你希望耳機裡傳來的第一個聲音是？</div>
-            <button class="btn" onclick="calculateResult('甲')">甲. 厚重的重低音或強烈的鼓點。</button>
-            <button class="btn" onclick="calculateResult('乙')">乙. 溫柔的鋼琴、吉他或呢喃的人聲。</button>
-            <button class="btn" onclick="calculateResult('丙')">丙. 帶有流暢編制、層次豐富的樂器行進感。</button>
-        `;
-    }
-
-    function calculateResult(q3Ans) {
-        userAnswers.q3 = q3Ans;
-        let finalSong = '';
-        const q1 = userAnswers.q1;
-        const q2 = userAnswers.q2;
-        const q3 = userAnswers.q3;
-
-        // 判定邏輯演算法
-        if (q1 === 'A') {
-            if (q2 === 'A-1') finalSong = '黑色台北';
-            else if (q2 === 'A-2') finalSong = '天堂與泥土';
-            else if (q2 === 'A-4') finalSong = 'I No'; // 新加入：盧廣仲
-            else if (q2 === 'A-3') {
-                if (q3 === '丙') finalSong = 'TATTOO';
-                else finalSong = 'BREATHE';
-            }
-        } else if (q1 === 'B') {
-            if (q2 === 'B-1') finalSong = 'ITEM';
-            else if (q2 === 'B-2') finalSong = 'Morse Code';
-        } else if (q1 === 'C') {
-            if (q2 === 'C-1') finalSong = 'X Song';
-            else if (q2 === 'C-2') finalSong = 'Just Like This';
-            else if (q2 === 'C-3') finalSong = 'Lisianthus';
-            else if (q2 === 'C-4') finalSong = '言不由衷'; // 新加入：甜約翰
+    // 餵食功能
+    function feedPig(type) {
+        if (hunger >= 100) {
+            createFloatingText('吃不下了... 💤');
+            return;
         }
 
-        // 萬一有漏網的防呆機制
-        if (!finalSong) finalSong = 'Just Like This';
+        pig.classList.add('is-eating');
+        setTimeout(() => pig.classList.remove('is-eating'), 300);
 
-        showResult(finalSong);
+        if (type === 'grass') {
+            hunger = Math.min(100, hunger + 15);
+            createFloatingText('嚼嚼嚼...🌾');
+        } else if (type === 'food') {
+            hunger = Math.min(100, hunger + 25);
+            happiness = Math.min(100, happiness + 10);
+            createFloatingText('Pui! 好吃! 🥕');
+        }
+        updateStatus();
     }
 
-    function showResult(songName) {
-        const song = songDatabase[songName];
-        quizBox.innerHTML = `
-            <h1>🔮 你的音樂處方箋已生成</h1>
-            <div class="result-title">當下情緒狀態：${song.status}</div>
-            <div class="song-title">🎧 ${songName}</div>
-            <p class="intro">${song.desc}</p>
-            <a href="${song.url}" target="_blank" class="yt-link">▶ 在 YouTube 上聆聽這首歌</a>
-            <button class="btn restart-btn" onclick="showStartPage()">重新測驗</button>
-        `;
+    // 嚕天竺鼠（摸摸）
+    function petPig() {
+        happiness = Math.min(100, happiness + 15);
+        
+        pig.classList.add('is-petting');
+        setTimeout(() => pig.classList.remove('is-petting'), 200);
+
+        const sounds = ['Pui Pui! 💕', '515151~ 🥰', '（舒服到變吐司）', '啾啾！'];
+        const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
+        createFloatingText(randomSound);
+        
+        updateStatus();
     }
 
-    showStartPage();
+    // 更新狀態條與文字
+    function updateStatus() {
+        document.getElementById('hunger-text').innerText = Math.floor(hunger);
+        document.getElementById('hunger-bar').style.width = hunger + '%';
+        
+        document.getElementById('happiness-text').innerText = Math.floor(happiness);
+        document.getElementById('happiness-bar').style.width = happiness + '%';
+    }
+
+    // 產生飄浮文字特效
+    function createFloatingText(text) {
+        const txtEl = document.createElement('div');
+        txtEl.className = 'floating-text';
+        txtEl.innerText = text;
+        
+        // 隨機在天竺鼠附近產生
+        const randomX = Math.random() * 60 + 100;
+        txtEl.style.left = randomX + 'px';
+        txtEl.style.top = '40px';
+        
+        stage.appendChild(txtEl);
+        
+        // 動畫結束後自動刪除，避免佔記憶體
+        setTimeout(() => {
+            txtEl.remove();
+        }, 800);
+    }
+
+    // 模擬時間流逝（每 3 秒肚子變餓、心情變差一點點）
+    setInterval(() => {
+        hunger = Math.max(0, hunger - 2);
+        happiness = Math.max(0, happiness - 1.5);
+        updateStatus();
+        
+        if (hunger < 30) {
+            if(Math.random() > 0.7) createFloatingText('主人我餓了... 🥺');
+        }
+    }, 3000);
 </script>
 
 </body>
