@@ -3,249 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>不要嚇跑地瓜鳥！學測保衛戰 V6</title>
+    <title>音樂心理測驗：深夜的寂寞唱片行</title>
     <style>
+        /* 全域黑夜風格美化 */
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f1ea; 
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        #game-container {
-            max-width: 600px;
-            width: 100%;
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-            box-sizing: border-box;
-        }
-        #bird-container {
-            width: 100%;
-            height: 300px; 
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, "Microsoft JhengHei", sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 20px;
-            background-color: #e9e4d9;
-            border-radius: 10px;
-            overflow: hidden;
-            border: 2px solid #ddd;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
-        #bird-image {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-        #status-text {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 15px;
-            min-height: 35px;
-        }
-        #score-board {
-            font-size: 20px;
-            margin: 15px 0;
-            color: #555;
-            background: #fdfcf9;
-            padding: 10px;
-            border-radius: 10px;
-            line-height: 1.5;
-        }
-        
-        /* 驚嚇度計量條 - 這次直接顯示，方便檢查有沒有動！ */
-        #alert-container {
+        .container {
+            background-color: #1e1e1e;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 600px;
             width: 100%;
-            background-color: #ddd;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            overflow: hidden;
-            height: 20px;
-            border: 1px solid #ccc;
+            text-align: center;
+            border: 1px solid #333;
         }
-        #alert-bar {
-            width: 0%;
-            height: 100%;
-            background-color: #2e7d32;
-            transition: width 0.05s linear;
+        h1 {
+            color: #ff4081;
+            font-size: 24px;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
         }
-
-        #btn-approach {
-            font-size: 26px;
-            font-weight: bold;
-            padding: 20px 60px;
-            background-color: #7a5c42; 
-            color: white;
-            border: none;
-            border-radius: 50px;
+        p.intro {
+            line-height: 1.8;
+            color: #aaa;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .question-text {
+            font-size: 20px;
+            margin-bottom: 25px;
+            color: #fff;
+            font-weight: 500;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            margin: 12px 0;
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+            border: 1px solid #444;
+            border-radius: 8px;
             cursor: pointer;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-            
-            /* 關閉所有可能干擾的預設點擊行為 */
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            text-align: left;
         }
-        #btn-approach:active {
-            background-color: #5d4632;
+        .btn:hover {
+            background-color: #ff4081;
+            color: #fff;
+            border-color: #ff4081;
+            transform: translateY(-2px);
         }
-        #disclaimer {
-            font-size: 14px;
-            color: #888;
-            margin-top: 20px;
+        /* 結果頁特別樣式 */
+        .result-title {
+            color: #00e5ff;
+            font-size: 22px;
+            margin-top: 10px;
         }
-        .safe-text { color: #2e7d32; }
-        .warning-text { color: #f57c00; font-weight: 900; }
-        .danger-text { color: #d32f2f; font-weight: 900; }
-        .win-text { color: #1565c0; font-weight: 900; }
+        .song-title {
+            font-size: 26px;
+            color: #fff;
+            margin: 20px 0;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0,229,255,0.3);
+        }
+        .yt-link {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 30px;
+            background-color: #ff0000;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .yt-link:hover {
+            background-color: #cc0000;
+            box-shadow: 0 0 15px rgba(255,0,0,0.5);
+        }
+        .restart-btn {
+            margin-top: 15px;
+            background-color: transparent;
+            color: #aaa;
+            border: 1px dashed #555;
+            text-align: center;
+        }
+        .restart-btn:hover {
+            background-color: #333;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
 
-<div id="game-container">
-    <h2>🐦 地瓜鳥學測保衛戰 🍠</h2>
-    <p style="color: #666; font-size: 15px;">核心規則：按住按鈕前進，驚嚇條會爆升！放開按鈕會冷靜。注意地瓜鳥的狀態！</p>
-    
-    <div id="bird-container">
-        <img id="bird-image" src="https://upload.wikimedia.org/wikipedia/commons/d/df/Malayan_Night-Heron_-_Taiwan_S4E8695_%2817320173361%29.jpg" alt="地瓜鳥發呆">
+<div class="container" id="quiz-box">
     </div>
-    
-    <div style="font-size: 14px; text-align: left; margin-bottom: 5px; color: #666;">地瓜鳥警覺心：</div>
-    <div id="alert-container">
-        <div id="alert-bar"></div>
-    </div>
-
-    <div id="status-text" class="safe-text">地瓜鳥正在裝成一顆地瓜...</div>
-    
-    <div id="score-board">
-        目前距離：<span id="distance">5.00</span> 公尺<br>
-        預估學測分數：<span id="score">0</span> 級分
-    </div>
-    
-    <button id="btn-approach" 
-            onmousedown="startApproach()" 
-            onmouseup="stopApproach()" 
-            onmouseleave="stopApproach()"
-            ontouchstart="startApproach()" 
-            ontouchend="stopApproach()">
-        按住悄悄靠近
-    </button>
-</div>
-
-<div id="disclaimer">⚠️ 本遊戲僅供娛樂，祝福各位學測順利。</div>
 
 <script>
-    const birdImageEl = document.getElementById('bird-image');
-    const statusTextEl = document.getElementById('status-text');
-    const distanceEl = document.getElementById('distance');
-    const scoreEl = document.getElementById('score');
-    const btnApproach = document.getElementById('btn-approach');
-    const alertBar = document.getElementById('alert-bar');
+    // 儲存使用者選擇的答案
+    let userAnswers = { q1: '', q2: '', q3: '' };
 
-    const imgUrls = {
-        safe: 'https://upload.wikimedia.org/wikipedia/commons/d/df/Malayan_Night-Heron_-_Taiwan_S4E8695_%2817320173361%29.jpg', 
-        approaching: 'https://singaporebirds.com/wp-content/uploads/2021/07/malayan-night-heron-191113-103msdcf-fyp06483-n.jpg', 
-        warning: 'https://i.ytimg.com/vi/cAKBKwohlZ8/maxresdefault.jpg', 
-        danger: 'https://cdn.hk01.com/media/images/2330752/org/cb336fba1df445b2bcf4ef84a861f6c4.jpg', 
-        flyaway: 'https://e-info.org.tw/images/01926580-a762-4428-8a12-26d8d8b250b8.jpg', 
-        win: 'https://www.fju.edu.tw/showImg/focus/focus2137.jpg' 
+    // 歌曲資料庫與 YouTube 搜尋連結
+    const songDatabase = {
+        '黑色台北': { status: '都市社畜的集體焦慮/厭世', desc: '被生活壓得喘不過氣，對這個城市有點失望，只想大聲宣洩。', url: 'https://www.youtube.com/results?search_query=荷爾蒙少年+黑色台北' },
+        '天堂與泥土': { status: '徹底擺爛、沉澱的靈魂出竅', desc: '世界太吵了，現在只想躺平，讓意識像水一樣流動，什麼都不想管。', url: 'https://www.youtube.com/results?search_query=deca+joins+天堂與泥土' },
+        'BREATHE': { status: '需要大哭、被溫柔擁抱的極度悲傷', desc: '你真的辛苦了。沒關係，想哭就哭吧，這首歌會陪著你慢慢呼吸。', url: 'https://www.youtube.com/results?search_query=Leehi+BREATHE' },
+        'TATTOO': { status: '帶有高級感的孤獨', desc: '走在深夜的都市，雖然一個人有點寂寞，但我寂寞得很漂亮。', url: 'https://www.youtube.com/results?search_query=Mandark+TATTOO' },
+        'ITEM': { status: '火冒三丈、全火力輸出的宣洩', desc: '少來煩我！現在滿腦子油門踩到底，用最強烈的重低音把不爽全部炸掉。', url: 'https://www.youtube.com/results?search_query=Stray+kids+ITEM' },
+        'Morse Code': { status: '迷惘中帶點熱血的奔跑', desc: '雖然對未來有點不知所措，但血液裡的熱情還沒熄滅，衝就對了！', url: 'https://www.youtube.com/results?search_query=Dragon+Pony+Morse+Code' },
+        'X Song': { status: '酸酸甜甜的戀愛腦/小傲嬌', desc: '心裡有個人讓你想東想西，有點煩躁，但又忍不住一直想他。', url: 'https://www.youtube.com/results?search_query=BOL4+X+Song' },
+        'Just Like This': { status: '微醺微甜的微放空', desc: '今天不想動腦，只想吹著微風，享受一下 Me Time。', url: 'https://www.youtube.com/results?search_query=loco+just+like+this' },
+        'Lisianthus': { status: '充滿希望的充能時刻', desc: '雖然有點累，但音符落下的瞬間，感覺明天又可以繼續加油了！', url: 'https://www.youtube.com/results?search_query=LUCY+Lisianthus' }
     };
 
-    let distance = 5.00;
-    let score = 0;
-    let gameState = 'SAFE'; 
-    let isPressing = false;
-    let alertLevel = 0; 
+    const quizBox = document.getElementById('quiz-box');
 
-    // 使用最穩定的單一主循環，每 40 毫秒執行一次
-    setInterval(function() {
-        if (gameState === 'GAME_OVER' || gameState === 'WIN') return;
+    // 進入首頁
+    function showStartPage() {
+        quizBox.innerHTML = `
+            <h1>🎵 深夜的寂寞唱片行</h1>
+            <p class="intro">凌晨兩點，你走在一條空無一人的街上，發現一家散發著微光的舊唱片行。<br>門口掛著一塊牌子：「進來吧，這裡有懂你的歌。」<br>你推開門走了進去……</p>
+            <button class="btn" style="text-align:center;" onclick="showQ1()">開啟音樂處方箋</button>
+        `;
+    }
 
-        // 1. 計算驚嚇值
-        if (isPressing) {
-            alertLevel += 2.5; // 按住時驚嚇值爬升
+    // 顯示問題 1
+    function showQ1() {
+        quizBox.innerHTML = `
+            <div class="question-text">Q1. 店裡放著好幾張黑膠唱片，第一張吸引你目光的封面是？</div>
+            <button class="btn" onclick="selectQ1('A')">A. 朦朧的霓虹燈街景，帶著一絲落寞。</button>
+            <button class="btn" onclick="selectQ1('B')">B. 燃燒的火焰與極簡的幾何圖形，很有衝突感。</button>
+            <button class="btn" onclick="selectQ1('C')">C. 溫暖的日落海灘，或是兩個人並肩的背影。</button>
+        `;
+    }
+
+    function selectQ1(ans) {
+        userAnswers.q1 = ans;
+        showQ2();
+    }
+
+    // 顯示問題 2 (根據 Q1 的選擇進行分流)
+    function showQ2() {
+        if (userAnswers.q1 === 'A') {
+            quizBox.innerHTML = `
+                <div class="question-text">Q2. 店長遞給你一杯飲料，這時候你最想喝什麼？</div>
+                <button class="btn" onclick="selectQ2('A-1')">A-1. 冰美式，苦澀但能讓我保持清醒。</button>
+                <button class="btn" onclick="selectQ2('A-2')">A-2. 烈酒，今晚只想把自己灌醉麻痺。</button>
+                <button class="btn" onclick="selectQ2('A-3')">A-3. 溫熱的熱可可，我現在需要被溫暖。</button>
+            `;
+        } else if (userAnswers.q1 === 'B') {
+            quizBox.innerHTML = `
+                <div class="question-text">Q2. 唱片行後方突然傳來一陣撞擊聲，你的第一反應是？</div>
+                <button class="btn" onclick="selectQ2('B-1')">B-1. 握緊拳頭，心裡莫名燃起一把火，想去一探究竟。</button>
+                <button class="btn" onclick="selectQ2('B-2')">B-2. 隨著聲音的節奏心跳加快，感到一種莫名的熱血。</button>
+            `;
+        } else if (userAnswers.q1 === 'C') {
+            quizBox.innerHTML = `
+                <div class="question-text">Q2. 這時候，店裡的角落有一隻貓咪悄悄走過來蹭你的腳，你覺得牠在想什麼？</div>
+                <button class="btn" onclick="selectQ2('C-1')">C-1. 牠只是肚子餓了，跟我一樣想找個依靠。</button>
+                <button class="btn" onclick="selectQ2('C-2')">C-2. 牠純粹想陪著我，享受這個安靜的片刻。</button>
+                <button class="btn" onclick="selectQ2('C-3')">C-3. 牠在幫我加油打氣，告訴我明天會更好。</button>
+            `;
+        }
+    }
+
+    function selectQ2(ans) {
+        userAnswers.q2 = ans;
+        showQ3();
+    }
+
+    // 顯示問題 3 (最後關鍵)
+    function showQ3() {
+        quizBox.innerHTML = `
+            <div class="question-text">Q3. 當你準備戴上耳機試聽，你希望耳機裡傳來的第一個聲音是？</div>
+            <button class="btn" onclick="calculateResult('甲')">甲. 厚重的重低音或強烈的鼓點。</button>
+            <button class="btn" onclick="calculateResult('乙')">乙. 溫柔的鋼琴、吉他或呢喃的人聲。</button>
+            <button class="btn" onclick="calculateResult('丙')">丙. 帶有復古感、迷幻的電子合成器音效。</button>
+        `;
+    }
+
+    // 計算結果
+    function calculateResult(q3Ans) {
+        userAnswers.q3 = q3Ans;
+        let finalSong = '';
+        const q1 = userAnswers.q1;
+        const q2 = userAnswers.q2;
+        const q3 = userAnswers.q3;
+
+        // 判定邏輯
+        if (q1 === 'A' && q2 === 'A-1') {
+            finalSong = '黑色台北';
+        } else if (q1 === 'A' && q2 === 'A-2') {
+            finalSong = '天堂與泥土';
+        } else if (q1 === 'A' && q2 === 'A-3' && q3 === '丙') {
+            finalSong = 'TATTOO';
+        } else if (q1 === 'A' && q2 === 'A-3') {
+            finalSong = 'BREATHE'; // A-3 搭配其他預設
+        } else if (q1 === 'B' && q2 === 'B-1') {
+            finalSong = 'ITEM';
+        } else if (q1 === 'B' && q2 === 'B-2') {
+            finalSong = 'Morse Code';
+        } else if (q1 === 'C' && q2 === 'C-1') {
+            finalSong = 'X Song';
+        } else if (q1 === 'C' && q2 === 'C-2') {
+            finalSong = 'Just Like This';
+        } else if (q1 === 'C' && q2 === 'C-3') {
+            finalSong = 'Lisianthus';
         } else {
-            alertLevel -= 1.5; // 放開時驚嚇值冷卻
+            // 安全防護線：萬一有未定義的奇特組合，隨機給一首
+            finalSong = 'Just Like This';
         }
 
-        // 邊界限制
-        if (alertLevel < 0) alertLevel = 0;
-        if (alertLevel > 100) alertLevel = 100;
-
-        // 更新驚嚇條視覺
-        alertBar.style.width = alertLevel + '%';
-
-        // 2. 判斷地瓜鳥狀態與換圖
-        if (alertLevel <= 40) {
-            gameState = 'SAFE';
-            statusTextEl.innerText = '地瓜鳥正在裝成一顆地瓜...';
-            statusTextEl.className = 'safe-text';
-            birdImageEl.src = isPressing ? imgUrls.approaching : imgUrls.safe;
-            alertBar.style.backgroundColor = '#2e7d32';
-        } 
-        else if (alertLevel > 40 && alertLevel <= 85) {
-            gameState = 'WARNING';
-            statusTextEl.innerText = '（警告：牠開始瘋狂扭脖子了！！）';
-            statusTextEl.className = 'warning-text';
-            birdImageEl.src = imgUrls.warning;
-            alertBar.style.backgroundColor = '#f57c00';
-        } 
-        else if (alertLevel > 85) {
-            gameState = 'DANGER';
-            statusTextEl.innerText = '！！！牠轉過來狠瞪你了！！！';
-            statusTextEl.className = 'danger-text';
-            birdImageEl.src = imgUrls.danger;
-            alertBar.style.backgroundColor = '#d32f2f';
-
-            // 危險期只要玩家還在按，直接爆開
-            if (isPressing) {
-                gameState = 'GAME_OVER';
-                birdImageEl.src = imgUrls.flyaway;
-                statusTextEl.innerText = '地瓜鳥飛走了！學測扣 60 級分，重考班在等你了...😭';
-                btnApproach.style.display = 'none'; // 直接隱藏按鈕防止再點
-                return;
-            }
-        }
-
-        // 3. 玩家前進扣距離
-        if (isPressing && gameState !== 'DANGER') {
-            if (distance > 0.05) {
-                distance -= 0.05;
-                score = Math.floor((5 - distance) * 12.5);
-                if (score > 60) score = 60;
-
-                distanceEl.innerText = distance.toFixed(2);
-                scoreEl.innerText = score;
-            } else {
-                gameState = 'WIN';
-                birdImageEl.src = imgUrls.win;
-                statusTextEl.innerText = '✨ 你成功摸到了地瓜鳥！滿級分神話降臨！💯 ✨';
-                statusTextEl.className = 'win-text';
-                btnApproach.style.display = 'none';
-            }
-        }
-    }, 40);
-
-    // 觸發前進
-    function startApproach() {
-        if (gameState !== 'GAME_OVER' && gameState !== 'WIN') {
-            isPressing = true;
-            btnApproach.innerText = '正在悄悄靠近...';
-        }
+        showResult(finalSong);
     }
 
-    // 停止前進
-    function stopApproach() {
-        isPressing = false;
-        if (gameState !== 'GAME_OVER' && gameState !== 'WIN') {
-            btnApproach.innerText = '按住悄悄靠近';
-        }
+    // 顯示結果頁面
+    function showResult(songName) {
+        const song = songDatabase[songName];
+        quizBox.innerHTML = `
+            <h1>🔮 你的音樂處方箋已生成</h1>
+            <div class="result-title">當下情緒狀態：${song.status}</div>
+            <div class="song-title">🎧 ${songName}</div>
+            <p class="intro">${song.desc}</p>
+            <a href="${song.url}" target="_blank" class="yt-link">▶ 在 YouTube 上聆聽這首歌</a>
+            <button class="btn restart-btn" onclick="showStartPage()">重新測驗</button>
+        `;
     }
+
+    // 網頁載入時初始化
+    showStartPage();
 </script>
 
 </body>
