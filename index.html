@@ -6,7 +6,7 @@
     <title>音樂心理測驗：深夜的寂寞唱片行</title>
     <style>
         body {
-            background-color: #121212;
+            background-color: #0d0d0d;
             color: #e0e0e0;
             font-family: 'Helvetica Neue', Helvetica, Arial, "Microsoft JhengHei", sans-serif;
             display: flex;
@@ -18,20 +18,38 @@
             box-sizing: border-box;
         }
         .container {
-            background-color: #1e1e1e;
+            background-color: #161616;
             padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
             max-width: 600px;
             width: 100%;
             text-align: center;
-            border: 1px solid #333;
+            border: 1px solid #2a2a2a;
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background-color: #222;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff4081, #00e5ff);
+            box-shadow: 0 0 8px #ff4081;
+            transition: width 0.5s ease;
         }
         h1 {
             color: #ff4081;
-            font-size: 24px;
+            font-size: 26px;
             margin-bottom: 20px;
             letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 64, 129, 0.2);
         }
         p.intro {
             line-height: 1.8;
@@ -39,82 +57,104 @@
             margin-bottom: 30px;
             font-size: 16px;
         }
+        .fade-in {
+            animation: fadeInActive 0.6s ease forwards;
+        }
+        @keyframes fadeInActive {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         .question-text {
             font-size: 20px;
             margin-bottom: 25px;
             color: #fff;
             font-weight: 500;
+            line-height: 1.6;
         }
         .btn {
             display: block;
             width: 100%;
-            padding: 15px 20px;
-            margin: 12px 0;
-            background-color: #2a2a2a;
-            color: #e0e0e0;
-            border: 1px solid #444;
-            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 14px 0;
+            background-color: #1f1f1f;
+            color: #ccc;
+            border: 1px solid #333;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 16px;
             transition: all 0.3s ease;
             text-align: left;
         }
         .btn:hover {
-            background-color: #ff4081;
+            background-color: #252525;
             color: #fff;
             border-color: #ff4081;
+            box-shadow: 0 0 12px rgba(255, 64, 129, 0.3);
             transform: translateY(-2px);
         }
         .result-title {
             color: #00e5ff;
             font-size: 22px;
-            margin-top: 10px;
+            margin-top: 15px;
+            font-weight: bold;
         }
         .song-title {
-            font-size: 26px;
+            font-size: 28px;
             color: #fff;
-            margin: 20px 0;
+            margin: 25px 0;
             font-weight: bold;
-            text-shadow: 0 0 10px rgba(0,229,255,0.3);
+            text-shadow: 0 0 15px rgba(0,229,255,0.4);
         }
-        .yt-link {
-            display: inline-block;
-            margin-top: 25px;
-            padding: 12px 30px;
-            background-color: #ff0000;
-            color: white;
-            text-decoration: none;
+        .action-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        .action-btn {
+            padding: 12px 25px;
             border-radius: 25px;
             font-weight: bold;
-            transition: background 0.3s;
+            text-decoration: none;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
         }
-        .yt-link:hover {
-            background-color: #cc0000;
-            box-shadow: 0 0 15px rgba(255,0,0,0.5);
-        }
+        .yt-link { background-color: #ff0000; color: white; }
+        .yt-link:hover { background-color: #cc0000; box-shadow: 0 0 15px rgba(255,0,0,0.5); }
+        .share-btn { background-color: #00e5ff; color: #0d0d0d; }
+        .share-btn:hover { background-color: #00b2cc; box-shadow: 0 0 15px rgba(0,229,255,0.5); }
         .restart-btn {
-            margin-top: 15px;
             background-color: transparent;
-            color: #aaa;
-            border: 1px dashed #555;
+            color: #888;
+            border: 1px dashed #444;
+            width: auto;
+            padding: 10px 20px;
+            margin: 20px auto 0 auto;
             text-align: center;
         }
-        .restart-btn:hover {
-            background-color: #333;
-            color: #fff;
-        }
+        .restart-btn:hover { border-color: #aaa; color: #fff; }
     </style>
 </head>
 <body>
 
-<div class="container" id="quiz-box">
-    <!-- 內容會透過 JavaScript 動態切換 -->
+<div class="container">
+    <div class="progress-container">
+        <div class="progress-bar" id="progress"></div>
+    </div>
+    <div id="content-box" class="fade-in"></div>
 </div>
 
 <script>
-    let userAnswers = { q1: '', q2: '', q3: '' };
+    // 儲存每首歌曲的分數
+    let scores = {
+        '黑色台北': 0, '天堂與泥土': 0, 'BREATHE': 0, 'TATTOO': 0,
+        'ITEM': 0, 'Morse Code': 0, 'X Song': 0, 'Just Like This': 0,
+        'Lisianthus': 0, 'I No': 0, '言不由衷': 0
+    };
 
-    // 擴充後的 11 首歌曲資料庫
     const songDatabase = {
         '黑色台北': { status: '都市社畜的集體焦慮/厭世', desc: '被生活壓得喘不過氣，對這個城市有點失望，只想大聲宣洩。', url: 'https://www.youtube.com/results?search_query=荷爾蒙少年+黑色台北' },
         '天堂與泥土': { status: '徹底擺爛、沉澱的靈魂出竅', desc: '世界太吵了，現在只想躺平，讓意識像水一樣流動，什麼都不想管。', url: 'https://www.youtube.com/results?search_query=deca+joins+天堂與泥土' },
@@ -129,112 +169,137 @@
         '言不由衷': { status: '口是心非的遺憾與倔強', desc: '心裡明明很在意，表面上卻還要裝作若無其事。有些遺憾，只能唱進歌裡。', url: 'https://www.youtube.com/results?search_query=甜約翰+言不由衷' }
     };
 
-    const quizBox = document.getElementById('quiz-box');
+    const contentBox = document.getElementById('content-box');
+    const progressBar = document.getElementById('progress');
+
+    function updateContent(htmlCode, step) {
+        const progressPercentages = [0, 20, 40, 60, 80, 95, 100];
+        progressBar.style.width = progressPercentages[step] + '%';
+        contentBox.classList.remove('fade-in');
+        void contentBox.offsetWidth;
+        contentBox.innerHTML = htmlCode;
+        contentBox.classList.add('fade-in');
+    }
+
+    // 初始化分數
+    function resetScores() {
+        for (let key in scores) scores[key] = 0;
+    }
 
     function showStartPage() {
-        quizBox.innerHTML = `
+        resetScores();
+        const html = `
             <h1>🎵 深夜的寂寞唱片行</h1>
             <p class="intro">凌晨兩點，你走在一條空無一人的街上，發現一家散發著微光的舊唱片行。<br>門口掛著一塊牌子：「進來吧，這裡有懂你的歌。」<br>你推開門走了進去……</p>
-            <button class="btn" style="text-align:center;" onclick="showQ1()">開啟音樂處方箋</button>
+            <button class="btn" style="text-align:center; font-weight:bold; border-color:#ff4081;" onclick="showQ1()">開啟音樂處方箋</button>
         `;
+        updateContent(html, 0);
     }
 
+    // Q1: 環境氣氛
     function showQ1() {
-        quizBox.innerHTML = `
-            <div class="question-text">Q1. 店裡放著好幾張黑膠唱片，第一張吸引你目光的封面是？</div>
-            <button class="btn" onclick="selectQ1('A')">A. 朦朧的霓虹燈街景，帶著一絲落寞與疲憊。</button>
-            <button class="btn" onclick="selectQ1('B')">B. 燃燒的火焰與極簡的幾何圖形，很有衝突感。</button>
-            <button class="btn" onclick="selectQ1('C')">C. 溫暖的日落海灘，或是兩個人並肩的背影。</button>
+        const html = `
+            <div class="question-text">Q1. 走進店裡，空氣中飄散著一種味道，你覺得那最像是？</div>
+            <button class="btn" onclick="addScore(['黑色台北','天堂與泥土','I No'], showQ2)">A. 潮濕的雨水與老舊紙張的味道，有些沉重。</button>
+            <button class="btn" onclick="addScore(['ITEM','Morse Code','TATTOO'], showQ2)">B. 剛沖好的濃烈黑咖啡與微熱的機器過載味。</button>
+            <button class="btn" onclick="addScore(['Just Like This','X Song','Lisianthus','言不由衷','BREATHE'], showQ2)">C. 淡淡的木質香薰，夾雜著一絲甜味。</button>
         `;
+        updateContent(html, 1);
     }
 
-    function selectQ1(ans) {
-        userAnswers.q1 = ans;
-        showQ2();
-    }
-
+    // Q2: 視覺與封面
     function showQ2() {
-        if (userAnswers.q1 === 'A') {
-            quizBox.innerHTML = `
-                <div class="question-text">Q2. 店長遞給你一杯飲料，這時候你最想喝什麼？</div>
-                <button class="btn" onclick="selectQ2('A-1')">A-1. 冰美式，苦澀但能讓我保持清醒。</button>
-                <button class="btn" onclick="selectQ2('A-2')">A-2. 烈酒，今晚只想把自己灌醉麻痺。</button>
-                <button class="btn" onclick="selectQ2('A-3')">A-3. 溫熱的熱可可，我現在需要被溫暖。</button>
-                <button class="btn" onclick="selectQ2('A-4')">A-4. 白開水，淡淡的沒味道，就像我現在的心情。</button>
-            `;
-        } else if (userAnswers.q1 === 'B') {
-            quizBox.innerHTML = `
-                <div class="question-text">Q2. 唱片行後方突然傳來一陣撞擊聲，你的第一反應是？</div>
-                <button class="btn" onclick="selectQ2('B-1')">B-1. 握緊拳頭，心裡莫名燃起一把火，想去一探究竟。</button>
-                <button class="btn" onclick="selectQ2('B-2')">B-2. 隨著聲音的節奏心跳加快，感到一種莫名的熱血。</button>
-            `;
-        } else if (userAnswers.q1 === 'C') {
-            quizBox.innerHTML = `
-                <div class="question-text">Q2. 這時候，店裡的角落有一隻貓咪悄悄走過來蹭你的腳，你覺得牠在想什麼？</div>
-                <button class="btn" onclick="selectQ2('C-1')">C-1. 牠只是肚子餓了，跟我一樣想找個依靠。</button>
-                <button class="btn" onclick="selectQ2('C-2')">C-2. 牠純粹想陪著我，享受這個安靜的片刻。</button>
-                <button class="btn" onclick="selectQ2('C-3')">C-3. 牠在幫我加油打氣，告訴我明天會更好。</button>
-                <button class="btn" onclick="selectQ2('C-4')">C-4. 牠看穿了我的心事，卻假裝不知道。</button>
-            `;
-        }
-    }
-
-    function selectQ2(ans) {
-        userAnswers.q2 = ans;
-        showQ3();
-    }
-
-    function showQ3() {
-        quizBox.innerHTML = `
-            <div class="question-text">Q3. 當你準備戴上耳機試聽，你希望耳機裡傳來的第一個聲音是？</div>
-            <button class="btn" onclick="calculateResult('甲')">甲. 厚重的重低音或強烈的鼓點。</button>
-            <button class="btn" onclick="calculateResult('乙')">乙. 溫柔的鋼琴、吉他或呢喃的人聲。</button>
-            <button class="btn" onclick="calculateResult('丙')">丙. 帶有流暢編制、層次豐富的樂器行進感。</button>
+        const html = `
+            <div class="question-text">Q2. 店長沒有招呼你，只是指了指旁邊的架子。第一張吸引你目光的黑膠封面是？</div>
+            <button class="btn" onclick="addScore(['黑色台北','TATTOO','言不由衷'], showQ3)">A. 朦朧的深夜都市街景，霓虹燈失焦泛散。</button>
+            <button class="btn" onclick="addScore(['天堂與泥土','I No','BREATHE'], showQ3)">B. 一片虛無的灰白色天空，或者模糊的黑白人影。</button>
+            <button class="btn" onclick="addScore(['ITEM','Morse Code'], showQ3)">C. 充滿手繪感、色彩強烈且帶有衝撞感的塗鴉。</button>
+            <button class="btn" onclick="addScore(['Just Like This','X Song','Lisianthus'], showQ3)">D. 溫暖的夕陽海灘，陽光灑在海面上的波光。</button>
         `;
+        updateContent(html, 2);
     }
 
-    function calculateResult(q3Ans) {
-        userAnswers.q3 = q3Ans;
-        let finalSong = '';
-        const q1 = userAnswers.q1;
-        const q2 = userAnswers.q2;
-        const q3 = userAnswers.q3;
+    // Q3: 店內互動事件 (新題目)
+    function showQ3() {
+        const html = `
+            <div class="question-text">Q3. 這時，角落有一隻黑貓靜靜地走過來蹭你的腳，你下意識會怎麼做？</div>
+            <button class="btn" onclick="addScore(['Just Like This','Lisianthus','I No'], showQ4)">A. 蹲下來溫柔地揉揉牠，跟牠對視，覺得被治癒了。</button>
+            <button class="btn" onclick="addScore(['X Song','言不由衷','TATTOO'], showQ4)">B. 輕輕碰牠一下，心想「你是不是跟我一樣孤單？」</button>
+            <button class="btn" onclick="addScore(['天堂與泥土','BREATHE','黑色台北'], showQ4)">C. 只是看著牠，嘆了一口氣，連伸手摸牠的力氣都沒有。</button>
+            <button class="btn" onclick="addScore(['ITEM','Morse Code'], showQ4)">D. 輕快地逗逗牠，試圖跟牠玩起來。</button>
+        `;
+        updateContent(html, 3);
+    }
 
-        // 判定邏輯演算法
-        if (q1 === 'A') {
-            if (q2 === 'A-1') finalSong = '黑色台北';
-            else if (q2 === 'A-2') finalSong = '天堂與泥土';
-            else if (q2 === 'A-4') finalSong = 'I No'; // 新加入：盧廣仲
-            else if (q2 === 'A-3') {
-                if (q3 === '丙') finalSong = 'TATTOO';
-                else finalSong = 'BREATHE';
+    // Q4: 挑選耳機 (新題目)
+    function showQ4() {
+        const html = `
+            <div class="question-text">Q4. 店長遞給你一副試聽耳機，這副耳機的外觀是？</div>
+            <button class="btn" onclick="addScore(['ITEM','黑色台北','Morse Code'], showQ5)">A. 金屬感重、線條硬朗的專業監聽全罩式耳機。</button>
+            <button class="btn" onclick="addScore(['TATTOO','言不由衷','X Song','Just Like This'], showQ5)">B. 帶有復古皮質軟墊、很有文青質感的木紋耳機。</button>
+            <button class="btn" onclick="addScore(['天堂與泥土','BREATHE','I No','Lisianthus'], showQ5)">C. 看起來毫無裝飾、甚至有點磨損的極簡素色耳機。</button>
+        `;
+        updateContent(html, 4);
+    }
+
+    // Q5: 聽覺直覺
+    function showQ5() {
+        const html = `
+            <div class="question-text">Q5. 戴上耳機，在音樂正式開始前，你最希望耳機裡先傳來什麼前奏聲音？</div>
+            <button class="btn" onclick="addScore(['ITEM','黑色台北','Morse Code'], calculateResult)">A. 震撼心臟的重低音顆粒或強烈的鼓點節奏。</button>
+            <button class="btn" onclick="addScore(['BREATHE','天堂與泥土','Just Like This','I No'], calculateResult)">B. 溫柔且安靜的單純鋼琴聲，或是吉他微弱的刷弦。</button>
+            <button class="btn" onclick="addScore(['TATTOO','X Song','Lisianthus','言不由衷'], calculateResult)">C. 帶有微醺、迷幻感的電子合成器（Synth）鋪墊音效。</button>
+        `;
+        updateContent(html, 5);
+    }
+
+    // 輔助函式：幫選中的歌曲加分
+    function addScore(songArray, nextFunction) {
+        songArray.forEach(song => {
+            if (scores[song] !== undefined) scores[song] += 1;
+        });
+        nextFunction();
+    }
+
+    // 計算得分最高的歌曲
+    function calculateResult() {
+        let maxScore = -1;
+        let finalSong = 'Just Like This'; // 預設防呆
+
+        for (let song in scores) {
+            if (scores[song] > maxScore) {
+                maxScore = scores[song];
+                finalSong = song;
             }
-        } else if (q1 === 'B') {
-            if (q2 === 'B-1') finalSong = 'ITEM';
-            else if (q2 === 'B-2') finalSong = 'Morse Code';
-        } else if (q1 === 'C') {
-            if (q2 === 'C-1') finalSong = 'X Song';
-            else if (q2 === 'C-2') finalSong = 'Just Like This';
-            else if (q2 === 'C-3') finalSong = 'Lisianthus';
-            else if (q2 === 'C-4') finalSong = '言不由衷'; // 新加入：甜約翰
         }
-
-        // 萬一有漏網的防呆機制
-        if (!finalSong) finalSong = 'Just Like This';
-
         showResult(finalSong);
+    }
+
+    function copyResult(songName, status) {
+        const text = `🔮 我的深夜音樂處方箋已生成！\n\n【當下情緒】${status}\n【命定歌曲】🎧 ${songName}\n\n歡迎來到「深夜的寂寞唱片行」，領取屬於你的當下之歌吧！`;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('處方箋已複製！快去發 Threads 或 IG 限動吧 😎');
+        }).catch(() => {
+            alert('複製失敗，請手動複製文字 Q_Q');
+        });
     }
 
     function showResult(songName) {
         const song = songDatabase[songName];
-        quizBox.innerHTML = `
+        const html = `
             <h1>🔮 你的音樂處方箋已生成</h1>
             <div class="result-title">當下情緒狀態：${song.status}</div>
             <div class="song-title">🎧 ${songName}</div>
             <p class="intro">${song.desc}</p>
-            <a href="${song.url}" target="_blank" class="yt-link">▶ 在 YouTube 上聆聽這首歌</a>
+            
+            <div class="action-group">
+                <a href="${song.url}" target="_blank" class="action-btn yt-link">▶ 在 YouTube 聆聽</a>
+                <button class="action-btn share-btn" onclick="copyResult('${songName}', '${song.status}')">📋 複製文字分享</button>
+            </div>
+            
             <button class="btn restart-btn" onclick="showStartPage()">重新測驗</button>
         `;
+        updateContent(html, 6);
     }
 
     showStartPage();
